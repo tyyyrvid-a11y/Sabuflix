@@ -1,0 +1,212 @@
+:root {
+  --color-bg: #000000;
+  --color-glass-bg: rgba(255, 255, 255, 0.05); /* Lighter touch of glass */
+  --color-glass-border: rgba(255, 255, 255, 0.08); /* Faint stroke */
+  --color-glass-hover: rgba(255, 255, 255, 0.15); /* More prominent on hover */
+  --color-text: #ffffff;
+  --color-text-dim: #a1a1a6; /* Apple classic gray */
+  --font-inter: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  --font-title: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", "Helvetica", Arial, sans-serif;
+  --transition-smooth: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  --radius-apple: 14px;
+  --spacing-px: 3.5rem;
+  --card-width: 170px;
+  --card-width-large: 260px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-inter);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Base Glassmorphism Class refined to Apple style (flat or subtle translucent) */
+.glass-panel {
+  position: relative;
+  background: var(--color-glass-bg);
+  border: 1px solid var(--color-glass-border);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border-radius: var(--radius-apple);
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+  overflow: hidden;
+}
+
+/* Apple TV Hover Cards Lift */
+.apple-card-hover {
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
+  border: 2px solid transparent;
+  outline: none;
+}
+
+.apple-card-hover:hover {
+  transform: scale(1.05);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+  border-color: rgba(255, 255, 255, 0.8); /* Signature Apple TV white outline on focus */
+  z-index: 10;
+}
+
+/* Precision Refractive Border Edge - Still useful but subtle */
+.glass-panel-glow {
+  position: absolute;
+  inset: 0px;
+  border-radius: inherit;
+  padding: 1px;
+  background: radial-gradient(
+    300px circle at var(--mouse-x, 0px) var(--mouse-y, 0px),
+    rgba(255, 255, 255, 0.3),
+    rgba(255, 255, 255, 0.05) 50%,
+    transparent 80%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 2;
+  transition: opacity 0.5s ease;
+}
+
+.glass-panel:hover .glass-panel-glow {
+  opacity: 1;
+}
+
+.liquid-effect, .glass-panel::after, .glass-panel::before {
+  display: none; /* Disabled heavily blurred SVGs */
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-title);
+  font-weight: 500; /* Helvetica Medium */
+  letter-spacing: -0.03em;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-in-out forwards;
+}
+
+/* Hide scrollbar for clean aesthetic */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent; 
+}
+
+/* Center layout fixes for tabs */
+.segmented-nav-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  padding: 0.3rem;
+  border-radius: 100px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+  :root {
+    --glass-padding: 1rem;
+    --spacing-px: 1rem;
+    --card-width: 140px;
+    --card-width-large: 220px;
+  }
+
+  body {
+    font-size: 14px;
+    padding-bottom: 80px; /* Leave space for bottom tab bar */
+  }
+
+  h1 { font-size: 1.8rem !important; }
+  h2 { font-size: 1.4rem !important; }
+  h3 { font-size: 1.1rem !important; }
+
+  .glass-panel {
+    border-radius: 12px;
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+  }
+
+  .nav-header-desktop {
+    display: none !important; /* Hide desktop nav center items */
+  }
+
+  /* Bottom Tab Bar for Mobile */
+  .bottom-tab-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 75px;
+    padding: 0 1rem;
+    padding-bottom: env(safe-area-inset-bottom, 15px);
+    background: rgba(25, 25, 25, 0.85);
+    backdrop-filter: blur(30px) saturate(180%);
+    -webkit-backdrop-filter: blur(30px) saturate(180%);
+    border-top: 1px solid rgba(255,255,255,0.1);
+    display: flex !important;
+    align-items: center;
+    justify-content: space-around;
+    z-index: 100;
+  }
+}
+
+@media (min-width: 769px) {
+  .bottom-tab-bar {
+    display: none !important;
+  }
+  .nav-header-mobile {
+    display: none !important;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --spacing-px: 1rem;
+    --card-width: 125px;
+  }
+  .glass-panel {
+    border-radius: 10px;
+  }
+}
+
