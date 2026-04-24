@@ -1,47 +1,41 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import AuthModal from "./AuthModal";
+import { useProfile } from "@/lib/ProfileContext";
 
-export default function ProfileMenu({ user }) {
+export default function ProfileMenu() {
+  const { user, activeProfile, profiles, changeProfile, addProfile, loading } = useProfile();
   const [showProfiles, setShowProfiles] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
-  const [profile, setProfile] = useState(null);
-
-  const loadProfile = useCallback(async () => {
-    if (!user) return;
-    const { data } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", user.id)
-      .single();
-    if (data) setProfile(data);
-  }, [user]);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    loadProfile();
-  }, [loadProfile]);
 
   const avatars = [
-    { id: "default", emoji: "👤", color: "rgba(255,255,255,0.2)" },
-    { id: "red", emoji: "🔥", color: "#ff4444" },
-    { id: "blue", emoji: "💙", color: "#4488ff" },
-    { id: "green", emoji: "💚", color: "#44ff44" },
-    { id: "purple", emoji: "💜", color: "#9944ff" },
-    { id: "orange", emoji: "🧡", color: "#ff9944" },
+    { id: "default", emoji: "👤", color: "rgba(255,255,255,0.2)", name: "Padrão" },
+    { id: "red", emoji: "🔥", color: "#ff4444", name: "Fogo" },
+    { id: "blue", emoji: "💙", color: "#4488ff", name: "Oceano" },
+    { id: "green", emoji: "💚", color: "#44ff44", name: "Natureza" },
+    { id: "purple", emoji: "💜", color: "#9944ff", name: "Magia" },
+    { id: "orange", emoji: "🧡", color: "#ff9944", name: "Pôr do Sol" },
   ];
 
-  const selectAvatar = async (avatarId) => {
-    const avatar = avatars.find(a => a.id === avatarId);
-    await supabase
-      .from("profiles")
-      .update({ avatar: avatarId })
-      .eq("id", user.id);
-    setProfile({ ...profile, avatar: avatarId });
+  const handleCreateProfile = async () => {
+    const name = prompt("Qual o nome do novo perfil?");
+    if (!name) return;
+    
+    // Select a random avatar color (excluding default)
+    const randomAvatar = avatars[Math.floor(Math.random() * (avatars.length - 1)) + 1];
+    await addProfile(name, randomAvatar.id);
+  };
+
+  const handleSelectProfile = (profileId) => {
+    changeProfile(profileId);
     setShowProfiles(false);
   };
+
+  if (loading) {
+    return <div className="glass-panel" style={{ padding: "0.5rem 1rem", borderRadius: "100px", border: "none" }}>...</div>;
+  }
 
   if (!user) {
     return (
@@ -69,13 +63,14 @@ export default function ProfileMenu({ user }) {
     );
   }
 
-  const currentAvatar = avatars.find(a => a.id === profile?.avatar) || avatars[0];
+  const currentAvatar = avatars.find(a => a.id === activeProfile?.avatar) || avatars[0];
 
   return (
     <>
       <div style={{ position: "relative" }}>
+        {/* Trigger Button in Header */}
         <button
-          onClick={() => setShowProfiles(!showProfiles)}
+          onClick={() => setShowProfiles(true)}
           className="glass-panel"
           style={{
             padding: "0.5rem 1rem",
@@ -88,109 +83,220 @@ export default function ProfileMenu({ user }) {
             display: "flex",
             alignItems: "center",
             gap: "0.5rem",
-            fontSize: "1.2rem"
+            fontSize: "1.2rem",
+            boxShadow: "0 2px 10px rgba(0,0,0,0.3)"
           }}
         >
           {currentAvatar.emoji}
-          <span style={{ fontSize: "0.85rem" }}>{profile?.name || user.email?.split("@")[0]}</span>
+          <span style={{ fontSize: "0.85rem" }}>{activeProfile?.name || user.email?.split("@")[0]}</span>
         </button>
 
+        {/* Full Screen Apple TV Modal */}
         {showProfiles && (
           <div
-            className="glass-panel animate-fade-in"
+            className="animate-fade-in"
             style={{
-              position: "absolute",
-              top: "100%",
-              right: 0,
-              marginTop: "0.5rem",
-              padding: "1rem",
-              borderRadius: "15px",
-              minWidth: "200px",
-              zIndex: 100
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "100vw",
+              height: "100vh",
+              zIndex: 99999, // Ensure it's above everything
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              /* Using a warm, sunset-like gradient matching the image */
+              background: "radial-gradient(circle at center, rgba(140, 70, 30, 0.8) 0%, rgba(30, 15, 10, 0.95) 100%)",
+              backdropFilter: "blur(40px)",
+              WebkitBackdropFilter: "blur(40px)",
             }}
           >
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-              <button
-                onClick={() => setShowProfiles(false)}
-                style={{
-                  padding: "0.5rem",
-                  borderRadius: "8px",
-                  border: "none",
-                  background: "rgba(255,255,255,0.1)",
-                  color: "#fff",
-                  cursor: "pointer",
-                  textAlign: "left"
-                }}
-              >
-                Perfil: {profile?.name || user.email?.split("@")[0]}
-              </button>
+            {/* Close button */}
+            <button
+              onClick={() => setShowProfiles(false)}
+              style={{
+                position: "absolute",
+                top: "2.5rem",
+                right: "3rem",
+                background: "rgba(255,255,255,0.15)",
+                border: "none",
+                color: "#fff",
+                width: "48px",
+                height: "48px",
+                borderRadius: "50%",
+                fontSize: "1.8rem",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "all 0.2s",
+                boxShadow: "0 4px 15px rgba(0,0,0,0.3)"
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.background = "rgba(255,255,255,0.25)";
+                e.currentTarget.style.transform = "scale(1.1)";
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.background = "rgba(255,255,255,0.15)";
+                e.currentTarget.style.transform = "scale(1)";
+              }}
+            >
+              ×
+            </button>
 
+            <h1 style={{
+              fontSize: "3.5rem",
+              fontWeight: 600,
+              marginBottom: "4rem",
+              color: "#fff",
+              textShadow: "0 4px 20px rgba(0,0,0,0.6)",
+              letterSpacing: "-0.03em"
+            }}>
+              Quem está assistindo?
+            </h1>
+
+            <div style={{ 
+              display: "flex", 
+              gap: "2.5rem", 
+              alignItems: "flex-start", 
+              flexWrap: "wrap", 
+              justifyContent: "center", 
+              maxWidth: "1200px",
+              padding: "0 2rem"
+            }}>
+              {profiles.map((p) => {
+                const isSelected = activeProfile?.id === p.id;
+                const pAvatar = avatars.find(a => a.id === p.avatar) || avatars[0];
+                return (
+                  <div key={p.id} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1.5rem" }}>
+                    <button
+                      onClick={() => handleSelectProfile(p.id)}
+                      className="apple-card-hover"
+                      style={{
+                        width: "160px",
+                        height: "160px",
+                        borderRadius: "50%",
+                        background: pAvatar.color,
+                        border: isSelected ? "5px solid #fff" : "5px solid transparent",
+                        fontSize: "4.5rem",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        boxShadow: isSelected ? "0 0 40px rgba(255,255,255,0.5)" : "0 10px 30px rgba(0,0,0,0.6)",
+                        transition: "all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)",
+                        outline: "none"
+                      }}
+                    >
+                      {pAvatar.emoji}
+                    </button>
+                    <span style={{
+                      fontSize: "1.3rem",
+                      fontWeight: isSelected ? 600 : 400,
+                      color: isSelected ? "#fff" : "rgba(255,255,255,0.7)",
+                      transition: "color 0.3s",
+                      textShadow: "0 2px 10px rgba(0,0,0,0.5)"
+                    }}>
+                      {p.name}
+                    </span>
+                  </div>
+                );
+              })}
+
+              {/* Add Profile Button */}
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1.5rem" }}>
+                <button
+                  className="apple-card-hover"
+                  style={{
+                    width: "160px",
+                    height: "160px",
+                    borderRadius: "50%",
+                    background: "rgba(255,255,255,0.1)",
+                    border: "5px solid transparent",
+                    fontSize: "4.5rem",
+                    color: "rgba(255,255,255,0.8)",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
+                    transition: "all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)",
+                    outline: "none"
+                  }}
+                  onClick={handleCreateProfile}
+                >
+                  +
+                </button>
+                <span style={{
+                  fontSize: "1.3rem",
+                  color: "rgba(255,255,255,0.7)",
+                  textShadow: "0 2px 10px rgba(0,0,0,0.5)"
+                }}>
+                  Adicionar
+                </span>
+              </div>
+            </div>
+
+            {/* Bottom Actions */}
+            <div style={{
+              marginTop: "6rem",
+              display: "flex",
+              gap: "1.5rem"
+            }}>
               <a
                 href="/playlist"
                 onClick={() => setShowProfiles(false)}
+                className="glass-panel"
                 style={{
-                  padding: "0.5rem",
-                  borderRadius: "8px",
-                  border: "none",
-                  background: "rgba(255,255,255,0.1)",
+                  padding: "1rem 3rem",
+                  borderRadius: "100px",
                   color: "#fff",
-                  cursor: "pointer",
                   textDecoration: "none",
-                  display: "block"
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  transition: "background 0.2s, transform 0.2s",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center"
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.background = "rgba(255,255,255,0.15)";
+                  e.currentTarget.style.transform = "scale(1.05)";
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.background = "var(--color-glass-bg)";
+                  e.currentTarget.style.transform = "scale(1)";
                 }}
               >
                 Minha Lista
               </a>
-
-              <div style={{
-                borderTop: "1px solid rgba(255,255,255,0.1)",
-                marginTop: "0.5rem",
-                paddingTop: "0.5rem"
-              }}>
-                <p style={{
-                  fontSize: "0.75rem",
-                  color: "rgba(255,255,255,0.5)",
-                  marginBottom: "0.5rem"
-                }}>
-                  Escolher avatar:
-                </p>
-                <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-                  {avatars.map((avatar) => (
-                    <button
-                      key={avatar.id}
-                      onClick={() => selectAvatar(avatar.id)}
-                      style={{
-                        width: "40px",
-                        height: "40px",
-                        borderRadius: "50%",
-                        border: profile?.avatar === avatar.id ? "2px solid #fff" : "none",
-                        background: avatar.color,
-                        fontSize: "1.2rem",
-                        cursor: "pointer"
-                      }}
-                    >
-                      {avatar.emoji}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
               <button
                 onClick={async () => {
                   await supabase.auth.signOut();
                   setShowProfiles(false);
                 }}
+                className="glass-panel"
                 style={{
-                  padding: "0.5rem",
-                  borderRadius: "8px",
-                  border: "none",
-                  background: "rgba(255,0,0,0.3)",
+                  padding: "1rem 3rem",
+                  borderRadius: "100px",
                   color: "#ff6b6b",
+                  border: "none",
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
                   cursor: "pointer",
-                  marginTop: "0.5rem"
+                  transition: "background 0.2s, transform 0.2s"
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.background = "rgba(255,0,0,0.15)";
+                  e.currentTarget.style.transform = "scale(1.05)";
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.background = "var(--color-glass-bg)";
+                  e.currentTarget.style.transform = "scale(1)";
                 }}
               >
-                Sair
+                Sair da Conta
               </button>
             </div>
           </div>

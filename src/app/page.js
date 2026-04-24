@@ -8,6 +8,7 @@ import SmartSearch from "@/components/SmartSearch";
 import ForYou from "@/components/ForYou";
 import PlayerOverlay from "@/components/PlayerOverlay";
 import BiographyModal from "@/components/BiographyModal";
+import ContinueWatching from "@/components/ContinueWatching";
 
 export default function Home() {
   const [mode, setMode] = useState("foryou"); // 'search' or 'foryou'
@@ -151,6 +152,10 @@ export default function Home() {
           </div>
         )}
         
+        {mode === 'foryou' && (
+          <ContinueWatching openPlayer={setPlayerItem} />
+        )}
+
         {mode === 'search' && (
           <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
             <SearchInput mode={mode} onSearch={handleSearch} query={query} />

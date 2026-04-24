@@ -2,10 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { getTVSeasons, getTVSeasonEpisodes, getImageUrl } from "@/lib/tmdb";
+import { useProfile } from "@/lib/ProfileContext";
+import { supabase } from "@/lib/supabase";
 
 export default function PlayerOverlay({ item, onClose }) {
   const [isActivated, setIsActivated] = useState(false);
   const [provider, setProvider] = useState('superflix');
+  const { activeProfile } = useProfile() || {};
   
   const type = item.media_type || (item.title ? 'movie' : 'tv');
   const tmdbId = item.id;
@@ -34,6 +37,29 @@ export default function PlayerOverlay({ item, onClose }) {
       fetchSeriesData();
     }
   }, [tmdbId, type]);
+
+  useEffect(() => {
+    if (isActivated && activeProfile) {
+      const saveHistory = async () => {
+        const titleToSave = item.title || item.name;
+        const payload = {
+          profile_id: activeProfile.id,
+          tmdb_id: tmdbId,
+          media_type: type,
+          title: titleToSave,
+          poster_path: item.poster_path,
+          backdrop_path: item.backdrop_path,
+          progress: type === 'tv' ? selectedEpisodeNum : 1, // Store episode num for TV
+          updated_at: new Date().toISOString()
+        };
+
+        await supabase
+          .from('continue_watching')
+          .upsert(payload, { onConflict: 'profile_id, tmdb_id' });
+      };
+      saveHistory();
+    }
+  }, [isActivated, activeProfile, tmdbId, type, item, selectedEpisodeNum]);
 
   const handleSeasonChange = async (seasonNum, isInitialLoad = false) => {
     setSelectedSeason(seasonNum);
