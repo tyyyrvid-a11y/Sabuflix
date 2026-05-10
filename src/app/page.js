@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { getTrending } from "@/lib/tmdb";
 import HeroBackground from "@/components/HeroBackground";
 import SearchToggle from "@/components/SearchToggle";
@@ -21,6 +21,15 @@ export default function Home() {
   // Modals state
   const [playerItem, setPlayerItem] = useState(null); // The TMDB item to play
   const [biographyPerson, setBiographyPerson] = useState(null); // The TMDB person to view
+
+  // Listen for header search selections (dispatched as custom events)
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.detail) setPlayerItem(e.detail);
+    };
+    window.addEventListener("sabuflix:play", handler);
+    return () => window.removeEventListener("sabuflix:play", handler);
+  }, []);
 
   const handleSearch = (q) => {
     setQuery(q);

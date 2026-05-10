@@ -5,6 +5,7 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import ProfileMenu from "./ProfileMenu";
 import { hapticFeedback } from "@/lib/haptics";
+import HeaderSearch from "./HeaderSearch";
 
 export default function Header() {
   const [user, setUser] = useState(null);
@@ -117,6 +118,7 @@ export default function Header() {
         >
           Minha Lista
         </Link>
+        <HeaderSearch />
         <ProfileMenu user={user} />
       </nav>
     </header>
