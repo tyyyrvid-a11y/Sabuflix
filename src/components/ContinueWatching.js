@@ -4,11 +4,29 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useProfile } from "@/lib/ProfileContext";
 import { getImageUrl } from "@/lib/tmdb";
+import { hapticFeedback } from "@/lib/haptics";
 
 export default function ContinueWatching({ openPlayer }) {
   const { activeProfile } = useProfile() || {};
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const handleDelete = async (e, id) => {
+    e.stopPropagation();
+    hapticFeedback.medium();
+    
+    // Optimistic update
+    setHistory(prev => prev.filter(item => item.id !== id));
+    
+    const { error } = await supabase
+      .from('continue_watching')
+      .delete()
+      .eq('id', id);
+      
+    if (error) {
+      console.error("Error deleting from history:", error);
+    }
+  };
 
   useEffect(() => {
     async function loadHistory() {
@@ -119,6 +137,37 @@ export default function ContinueWatching({ openPlayer }) {
                   background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 60%)'
                }}></div>
                
+               {/* Delete Button */}
+               <button
+                 className="delete-history-btn"
+                 onClick={(e) => handleDelete(e, item.id)}
+                 style={{
+                   position: 'absolute',
+                   top: '0.5rem',
+                   right: '0.5rem',
+                   width: '32px',
+                   height: '32px',
+                   borderRadius: '50%',
+                   background: 'rgba(0,0,0,0.6)',
+                   border: '1px solid rgba(255,255,255,0.2)',
+                   color: '#fff',
+                   fontSize: '1.2rem',
+                   display: 'flex',
+                   alignItems: 'center',
+                   justifyContent: 'center',
+                   cursor: 'pointer',
+                   backdropFilter: 'blur(5px)',
+                   opacity: 0,
+                   transition: 'opacity 0.2s, background 0.2s',
+                   zIndex: 10
+                 }}
+                 onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,59,48,0.8)'}
+                 onMouseOut={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.6)'}
+                 title="Remover do histórico"
+               >
+                 ×
+               </button>
+               
                {/* Progress bar simulation */}
                <div style={{
                  position: 'absolute',
@@ -179,6 +228,7 @@ export default function ContinueWatching({ openPlayer }) {
       </div>
       <style dangerouslySetInnerHTML={{__html: `
         .apple-card-hover:hover .play-icon { opacity: 1 !important; }
+        .apple-card-hover:hover .delete-history-btn { opacity: 1 !important; }
       `}} />
     </div>
   );

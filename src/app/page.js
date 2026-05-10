@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { getTrending } from "@/lib/tmdb";
 import HeroBackground from "@/components/HeroBackground";
 import SearchToggle from "@/components/SearchToggle";
 import SearchInput from "@/components/SearchInput";
@@ -9,6 +10,8 @@ import ForYou from "@/components/ForYou";
 import PlayerOverlay from "@/components/PlayerOverlay";
 import BiographyModal from "@/components/BiographyModal";
 import ContinueWatching from "@/components/ContinueWatching";
+import { hapticFeedback } from "@/lib/haptics";
+import ClaudeBubbles from "@/components/ClaudeBubbles";
 
 export default function Home() {
   const [mode, setMode] = useState("foryou"); // 'search' or 'foryou'
@@ -35,10 +38,25 @@ export default function Home() {
     });
   }, []);
 
+  const handleSurpriseMe = async () => {
+    hapticFeedback.medium();
+    const data = await getTrending('all', 'week');
+    if (data && data.results && data.results.length > 0) {
+      // Pick a random item
+      const randomIndex = Math.floor(Math.random() * data.results.length);
+      const randomItem = data.results[randomIndex];
+      setPlayerItem(randomItem);
+    }
+  };
+
   return (
     <main style={{ minHeight: '100vh', position: 'relative' }}>
+      <ClaudeBubbles />
       {/* Fallback to poster if backdrop is missing */}
-      <HeroBackground backdropPath={heroItem?.backdrop_path || heroItem?.poster_path} />
+      <HeroBackground 
+        backdropPath={heroItem?.backdrop_path || heroItem?.poster_path} 
+        isAdult={heroItem?.adult}
+      />
       
       <div style={{
         position: 'relative',
@@ -67,7 +85,7 @@ export default function Home() {
             display: 'flex',
             flexDirection: 'column',
             gap: '1rem',
-            textShadow: '0 2px 10px rgba(0,0,0,0.8)'
+            textShadow: '0 2px 20px rgba(0,0,0,0.6), 0 0 10px rgba(0,0,0,0.3)'
           }}>
             <h1 style={{
               fontSize: '3.5rem',
@@ -104,49 +122,104 @@ export default function Home() {
 
             <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
               <button 
-                onClick={() => setPlayerItem(heroItem)}
+                onClick={() => {
+                  hapticFeedback.light();
+                  setPlayerItem(heroItem);
+                }}
                 style={{
                   background: '#fff',
-                  color: '#000',
+                  color: '#1e1d1b',
                   border: 'none',
-                  padding: '0.8rem 2rem',
-                  borderRadius: '100px',
+                  padding: '0.8rem 2.5rem',
+                  borderRadius: '12px',
                   fontWeight: 600,
                   fontSize: '1rem',
                   cursor: 'pointer',
-                  transition: 'transform 0.2s',
-                  boxShadow: '0 4px 15px rgba(255,255,255,0.3)',
+                  transition: 'transform 0.2s, box-shadow 0.2s',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.5rem'
                 }}
-                onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = 'scale(1.03)';
+                  e.currentTarget.style.boxShadow = '0 12px 30px rgba(0,0,0,0.5)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)';
+                  e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.4)';
+                }}
               >
                 ▶ Assistir
               </button>
               
               <button 
                 onClick={() => {
-                  if (heroItem.media_type === 'person') setBiographyPerson(heroItem);
+                  if (heroItem.media_type === 'person') {
+                    hapticFeedback.light();
+                    setBiographyPerson(heroItem);
+                  }
                 }}
                  style={{
-                  background: 'rgba(255,255,255,0.2)',
-                  backdropFilter: 'blur(10px)',
+                  background: 'rgba(255,255,255,0.1)',
+                  backdropFilter: 'blur(20px) saturate(180%)',
+                  WebkitBackdropFilter: 'blur(20px) saturate(180%)',
                   color: '#fff',
-                  border: 'none',
-                  padding: '0.8rem 2rem',
-                  borderRadius: '100px',
-                  fontWeight: 600,
+                  border: '1px solid rgba(255,255,255,0.15)',
+                  padding: '0.8rem 2.5rem',
+                  borderRadius: '12px',
+                  fontWeight: 500,
                   fontSize: '1rem',
                   cursor: heroItem.media_type === 'person' ? 'pointer' : 'default',
-                  transition: 'background 0.2s',
+                  transition: 'all 0.2s',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
                   opacity: heroItem.media_type === 'person' ? 1 : 0.5
                 }}
-                onMouseOver={(e) => { if(heroItem.media_type === 'person') e.currentTarget.style.background = 'rgba(255,255,255,0.3)'} }
-                onMouseOut={(e) => { if(heroItem.media_type === 'person') e.currentTarget.style.background = 'rgba(255,255,255,0.2)'} }
+                onMouseOver={(e) => { 
+                  if(heroItem.media_type === 'person') {
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.15)';
+                    e.currentTarget.style.transform = 'scale(1.03)';
+                  }
+                }}
+                onMouseOut={(e) => { 
+                  if(heroItem.media_type === 'person') {
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }
+                }}
               >
                 Detalhes
+              </button>
+
+              <button
+                onClick={handleSurpriseMe}
+                style={{
+                  background: 'rgba(255,255,255,0.1)',
+                  backdropFilter: 'blur(20px) saturate(180%)',
+                  WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+                  color: '#fff',
+                  border: '1px solid rgba(255,255,255,0.15)',
+                  padding: '0.8rem 2rem',
+                  borderRadius: '12px',
+                  fontWeight: 500,
+                  fontSize: '1rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.15)';
+                  e.currentTarget.style.transform = 'scale(1.03)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
+                  e.currentTarget.style.transform = 'scale(1)';
+                }}
+              >
+                <span style={{ fontSize: '1.2rem' }}>🎲</span> Surpreenda-me
               </button>
             </div>
           </div>
@@ -182,7 +255,10 @@ export default function Home() {
 
         {mode === 'search' && query && (
           <button 
-            onClick={clearSearch}
+            onClick={() => {
+              hapticFeedback.light();
+              clearSearch();
+            }}
             className="glass-panel"
             style={{
               marginTop: '4rem',

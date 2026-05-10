@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { getImageUrl } from "@/lib/tmdb";
+import AdultCensor from "./AdultCensor";
 
-export default function HeroBackground({ backdropPath }) {
+export default function HeroBackground({ backdropPath, isAdult }) {
   const [currentBg, setCurrentBg] = useState(null);
   const [previousBg, setPreviousBg] = useState(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -50,16 +51,18 @@ export default function HeroBackground({ backdropPath }) {
       position: 'fixed',
       top: 0, left: 0, right: 0, bottom: 0,
       zIndex: 1,
-      backgroundColor: '#000'
+      backgroundColor: '#1e1d1b'
     }}>
       {renderBg(previousBg, true)}
       {renderBg(currentBg, false)}
+      
+      <AdultCensor isAdult={isAdult} isBackground={true} />
       
       {/* Dark overlay for readability mimicking tvOS */}
       <div style={{
         position: 'absolute',
         top: 0, left: 0, right: 0, bottom: 0,
-        background: 'linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0.95) 80%, #000000 100%)',
+        background: 'linear-gradient(to bottom, rgba(30,29,27,0) 0%, rgba(30,29,27,0.5) 40%, rgba(30,29,27,0.95) 80%, #1e1d1b 100%)',
         zIndex: 3
       }} />
     </div>

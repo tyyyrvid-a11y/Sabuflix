@@ -10,6 +10,7 @@ export function ProfileProvider({ children }) {
   const [user, setUser] = useState(null);
   const [profiles, setProfiles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isCensored, setIsCensored] = useState(true);
 
   // Load user
   useEffect(() => {
@@ -44,22 +45,22 @@ export function ProfileProvider({ children }) {
       if (!error && data) {
         setProfiles(data);
         
-        // Try to restore active profile from localStorage
-        const savedProfileId = localStorage.getItem(`activeProfile_${user.id}`);
+        // Try to restore active profile from sessionStorage (persists only for current tab session)
+        const savedProfileId = sessionStorage.getItem(`activeProfile_${user.id}`);
         if (savedProfileId) {
           const profile = data.find(p => p.id === savedProfileId);
           if (profile) {
             setActiveProfile(profile);
+            const savedCensor = localStorage.getItem(`censor_${profile.id}`);
+            setIsCensored(savedCensor === null ? true : savedCensor === 'true');
             setLoading(false);
             return;
           }
         }
         
-        // Default to first profile if none saved
-        if (data.length > 0) {
-          setActiveProfile(data[0]);
-          localStorage.setItem(`activeProfile_${user.id}`, data[0].id);
-        }
+        // If no profile is saved in session, we leave activeProfile as null 
+        // to force the user to choose one.
+
       }
       setLoading(false);
     }
@@ -71,7 +72,17 @@ export function ProfileProvider({ children }) {
     const profile = profiles.find(p => p.id === profileId);
     if (profile && user) {
       setActiveProfile(profile);
-      localStorage.setItem(`activeProfile_${user.id}`, profile.id);
+      sessionStorage.setItem(`activeProfile_${user.id}`, profile.id);
+      const savedCensor = localStorage.getItem(`censor_${profile.id}`);
+      setIsCensored(savedCensor === null ? true : savedCensor === 'true');
+    }
+  };
+
+  const toggleCensor = () => {
+    if (activeProfile) {
+      const newValue = !isCensored;
+      setIsCensored(newValue);
+      localStorage.setItem(`censor_${activeProfile.id}`, newValue.toString());
     }
   };
 
@@ -97,7 +108,9 @@ export function ProfileProvider({ children }) {
       profiles,
       changeProfile,
       addProfile,
-      loading
+      loading,
+      isCensored,
+      toggleCensor
     }}>
       {children}
     </ProfileContext.Provider>

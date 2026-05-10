@@ -1,15 +1,14 @@
 :root {
-  --color-bg: #000000;
-  --color-glass-bg: rgba(255, 255, 255, 0.05); /* Lighter touch of glass */
-  --color-glass-border: rgba(255, 255, 255, 0.08); /* Faint stroke */
-  --color-glass-hover: rgba(255, 255, 255, 0.15); /* More prominent on hover */
-  --color-text: #ffffff;
-  --color-text-dim: #a1a1a6; /* Apple classic gray */
-  --font-inter: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-  --font-title: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", "Helvetica", Arial, sans-serif;
-  --transition-smooth: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-  --radius-apple: 14px;
-  --spacing-px: 3.5rem;
+  --color-bg: #1e1d1b;
+  --color-glass-bg: rgba(44, 42, 40, 0.75);
+  --color-glass-border: rgba(255, 255, 255, 0.06);
+  --color-glass-hover: rgba(55, 53, 50, 0.85);
+  --color-text: #f4f4f5;
+  --color-text-dim: #a1a1aa;
+  --color-accent: #d97757;
+  --transition-smooth: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  --radius-apple: 20px;
+  --spacing-px: 4rem;
   --card-width: 170px;
   --card-width-large: 260px;
 }
@@ -34,25 +33,27 @@ body {
   position: relative;
   background: var(--color-glass-bg);
   border: 1px solid var(--color-glass-border);
-  backdrop-filter: blur(20px) saturate(140%);
-  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
   border-radius: var(--radius-apple);
-  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease, border-color 0.4s ease, background 0.4s ease;
   overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
 
 /* Apple TV Hover Cards Lift */
 .apple-card-hover {
-  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s;
   border: 2px solid transparent;
   outline: none;
+  transform: translateZ(0); /* Hardware acceleration */
 }
 
 .apple-card-hover:hover {
-  transform: scale(1.05);
-  box-shadow: 0 15px 40px rgba(0,0,0,0.8);
-  border-color: rgba(255, 255, 255, 0.8); /* Signature Apple TV white outline on focus */
+  transform: scale(1.04) translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.7), 0 0 0 2px rgba(255, 255, 255, 0.8);
   z-index: 10;
+  filter: brightness(1.05);
 }
 
 /* Precision Refractive Border Edge - Still useful but subtle */
@@ -86,8 +87,8 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-title);
-  font-weight: 500; /* Helvetica Medium */
-  letter-spacing: -0.03em;
+  font-weight: 400; /* Serif looks better at 400 or 500 */
+  letter-spacing: -0.01em;
 }
 
 /* Animations */

@@ -24,6 +24,10 @@ export const searchMulti = async (query) => {
   return fetchTMDB('/search/multi', { query, include_adult: false, language: 'pt-BR', page: 1 });
 };
 
+export const getMovieDetails = async (movieId) => {
+  return fetchTMDB(`/movie/${movieId}`, { language: 'pt-BR' });
+};
+
 export const getMovieSimilar = async (movieId) => {
   return fetchTMDB(`/movie/${movieId}/similar`, { language: 'pt-BR', page: 1 });
 };
@@ -53,6 +57,22 @@ export const getDiscover = async (mediaType = 'movie', params = {}) => {
 };
 
 export const getImageUrl = (path, size = 'original') => {
-  if (!path) return '';
+  if (!path) return null;
   return `https://image.tmdb.org/t/p/${size}${path}`;
+};
+
+export const getGenres = async (mediaType = 'movie') => {
+  return fetchTMDB(`/genre/${mediaType}/list`, { language: 'pt-BR' });
+};
+
+export const getMovieRating = async (movieId) => {
+  return fetchTMDB(`/movie/${movieId}/release_dates`);
+};
+
+export const getTVRating = async (tvId) => {
+  return fetchTMDB(`/tv/${tvId}/content_ratings`);
+};
+
+export const getExternalIds = async (id, mediaType = 'movie') => {
+  return fetchTMDB(`/${mediaType}/${id}/external_ids`);
 };

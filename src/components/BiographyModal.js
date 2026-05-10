@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { getPersonCombinedCredits, getImageUrl } from "@/lib/tmdb";
 import { fetchWikipediaSummary } from "@/lib/wikipedia";
+import AdultCensor from "./AdultCensor";
 
 export default function BiographyModal({ person, onClose, openPlayer }) {
   const [wiki, setWiki] = useState(null);
@@ -198,11 +199,14 @@ export default function BiographyModal({ person, onClose, openPlayer }) {
                   onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
                   onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.03)'}
                 >
-                  <img 
-                    src={getImageUrl(c.poster_path, 'w92')} 
-                    alt={c.title || c.name}
-                    style={{ width: '45px', height: '68px', objectFit: 'cover', borderRadius: '4px' }}
-                  />
+                  <div style={{ position: 'relative', width: '45px', height: '68px', borderRadius: '4px', overflow: 'hidden' }}>
+                    <img 
+                      src={getImageUrl(c.poster_path, 'w92')} 
+                      alt={c.title || c.name}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                    <AdultCensor isAdult={c.adult} />
+                  </div>
                   <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                     <h4 style={{ margin: '0 0 0.25rem 0', fontSize: '1.1rem', fontWeight: 500 }}>{c.title || c.name}</h4>
                     <p style={{ margin: 0, fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)' }}>

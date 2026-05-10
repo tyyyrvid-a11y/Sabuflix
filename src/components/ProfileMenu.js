@@ -4,19 +4,23 @@ import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import AuthModal from "./AuthModal";
 import { useProfile } from "@/lib/ProfileContext";
+import { hapticFeedback } from "@/lib/haptics";
 
 export default function ProfileMenu() {
-  const { user, activeProfile, profiles, changeProfile, addProfile, loading } = useProfile();
+  const { user, activeProfile, profiles, changeProfile, addProfile, loading, isCensored, toggleCensor } = useProfile();
   const [showProfiles, setShowProfiles] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
 
+  const isMandatory = user && !activeProfile && !loading;
+  const displayModal = showProfiles || isMandatory;
+
   const avatars = [
-    { id: "default", emoji: "👤", color: "rgba(255,255,255,0.2)", name: "Padrão" },
-    { id: "red", emoji: "🔥", color: "#ff4444", name: "Fogo" },
-    { id: "blue", emoji: "💙", color: "#4488ff", name: "Oceano" },
-    { id: "green", emoji: "💚", color: "#44ff44", name: "Natureza" },
-    { id: "purple", emoji: "💜", color: "#9944ff", name: "Magia" },
-    { id: "orange", emoji: "🧡", color: "#ff9944", name: "Pôr do Sol" },
+    { id: "default", emoji: "👤", color: "rgba(44, 42, 40, 0.8)", name: "Padrão" },
+    { id: "red", emoji: "🔥", color: "#5c3a35", name: "Fogo" },
+    { id: "blue", emoji: "💙", color: "#354a5c", name: "Oceano" },
+    { id: "green", emoji: "💚", color: "#3a523d", name: "Natureza" },
+    { id: "purple", emoji: "💜", color: "#48355c", name: "Magia" },
+    { id: "orange", emoji: "🧡", color: "#61402e", name: "Pôr do Sol" },
   ];
 
   const handleCreateProfile = async () => {
@@ -29,6 +33,7 @@ export default function ProfileMenu() {
   };
 
   const handleSelectProfile = (profileId) => {
+    hapticFeedback.success();
     changeProfile(profileId);
     setShowProfiles(false);
   };
@@ -39,27 +44,7 @@ export default function ProfileMenu() {
 
   if (!user) {
     return (
-      <>
-        <button
-          onClick={() => setShowAuth(true)}
-          className="glass-panel"
-          style={{
-            padding: "0.6rem 1.2rem",
-            borderRadius: "100px",
-            border: "none",
-            background: "#fff",
-            color: "#000",
-            fontWeight: 600,
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            gap: "0.5rem"
-          }}
-        >
-          <span>Entrar</span>
-        </button>
-        <AuthModal isOpen={showAuth} onClose={() => setShowAuth(false)} />
-      </>
+      <AuthModal isOpen={true} onClose={() => {}} hideClose={true} />
     );
   }
 
@@ -70,29 +55,41 @@ export default function ProfileMenu() {
       <div style={{ position: "relative" }}>
         {/* Trigger Button in Header */}
         <button
-          onClick={() => setShowProfiles(true)}
+          onClick={() => {
+            hapticFeedback.light();
+            setShowProfiles(true);
+          }}
           className="glass-panel"
           style={{
-            padding: "0.5rem 1rem",
-            borderRadius: "100px",
-            border: "none",
+            padding: "0.5rem 1.2rem",
+            borderRadius: "12px",
+            border: "1px solid rgba(255,255,255,0.08)",
             background: currentAvatar.color,
             color: "#fff",
-            fontWeight: 600,
+            fontWeight: 500,
             cursor: "pointer",
             display: "flex",
             alignItems: "center",
             gap: "0.5rem",
-            fontSize: "1.2rem",
-            boxShadow: "0 2px 10px rgba(0,0,0,0.3)"
+            fontSize: "1rem",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)",
+            transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)"
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.transform = "translateY(-1px)";
+            e.currentTarget.style.boxShadow = "0 6px 16px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.15)";
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.transform = "translateY(0)";
+            e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)";
           }}
         >
-          {currentAvatar.emoji}
-          <span style={{ fontSize: "0.85rem" }}>{activeProfile?.name || user.email?.split("@")[0]}</span>
+          <span style={{ fontSize: "1.1rem" }}>{currentAvatar.emoji}</span>
+          <span>{activeProfile?.name || user.email?.split("@")[0]}</span>
         </button>
 
         {/* Full Screen Apple TV Modal */}
-        {showProfiles && (
+        {displayModal && (
           <div
             className="animate-fade-in"
             style={{
@@ -106,44 +103,48 @@ export default function ProfileMenu() {
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
-              /* Using a warm, sunset-like gradient matching the image */
-              background: "radial-gradient(circle at center, rgba(140, 70, 30, 0.8) 0%, rgba(30, 15, 10, 0.95) 100%)",
+              background: "rgba(30, 29, 27, 0.95)",
               backdropFilter: "blur(40px)",
               WebkitBackdropFilter: "blur(40px)",
             }}
           >
             {/* Close button */}
-            <button
-              onClick={() => setShowProfiles(false)}
-              style={{
-                position: "absolute",
-                top: "2.5rem",
-                right: "3rem",
-                background: "rgba(255,255,255,0.15)",
-                border: "none",
-                color: "#fff",
-                width: "48px",
-                height: "48px",
-                borderRadius: "50%",
-                fontSize: "1.8rem",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                transition: "all 0.2s",
-                boxShadow: "0 4px 15px rgba(0,0,0,0.3)"
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.background = "rgba(255,255,255,0.25)";
-                e.currentTarget.style.transform = "scale(1.1)";
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.background = "rgba(255,255,255,0.15)";
-                e.currentTarget.style.transform = "scale(1)";
-              }}
-            >
-              ×
-            </button>
+            {!isMandatory && (
+              <button
+                onClick={() => {
+                  hapticFeedback.light();
+                  setShowProfiles(false);
+                }}
+                style={{
+                  position: "absolute",
+                  top: "2.5rem",
+                  right: "3rem",
+                  background: "rgba(255,255,255,0.15)",
+                  border: "none",
+                  color: "#fff",
+                  width: "48px",
+                  height: "48px",
+                  borderRadius: "50%",
+                  fontSize: "1.8rem",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  transition: "all 0.2s",
+                  boxShadow: "0 4px 15px rgba(0,0,0,0.3)"
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.background = "rgba(255,255,255,0.25)";
+                  e.currentTarget.style.transform = "scale(1.1)";
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.background = "rgba(255,255,255,0.15)";
+                  e.currentTarget.style.transform = "scale(1)";
+                }}
+              >
+                ×
+              </button>
+            )}
 
             <h1 style={{
               fontSize: "3.5rem",
@@ -178,13 +179,13 @@ export default function ProfileMenu() {
                         height: "160px",
                         borderRadius: "50%",
                         background: pAvatar.color,
-                        border: isSelected ? "5px solid #fff" : "5px solid transparent",
+                        border: isSelected ? "2px solid #fff" : "1px solid rgba(255,255,255,0.1)",
                         fontSize: "4.5rem",
                         cursor: "pointer",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        boxShadow: isSelected ? "0 0 40px rgba(255,255,255,0.5)" : "0 10px 30px rgba(0,0,0,0.6)",
+                        boxShadow: isSelected ? "0 0 0 4px rgba(255,255,255,0.1), 0 10px 30px rgba(0,0,0,0.5)" : "0 8px 24px rgba(0,0,0,0.4)",
                         transition: "all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)",
                         outline: "none"
                       }}
@@ -224,7 +225,10 @@ export default function ProfileMenu() {
                     transition: "all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)",
                     outline: "none"
                   }}
-                  onClick={handleCreateProfile}
+                  onClick={() => {
+                    hapticFeedback.medium();
+                    handleCreateProfile();
+                  }}
                 >
                   +
                 </button>
@@ -238,23 +242,57 @@ export default function ProfileMenu() {
               </div>
             </div>
 
-            {/* Bottom Actions */}
-            <div style={{
-              marginTop: "6rem",
-              display: "flex",
-              gap: "1.5rem"
-            }}>
-              <a
+            {/* Bottom Actions - Hidden during mandatory selection to force focus on picking a profile */}
+            {!isMandatory && (
+              <div style={{
+                marginTop: "6rem",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "2rem"
+              }}>
+              {/* Settings / Toggles */}
+              <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                <span style={{ color: "#fff", fontSize: "1.1rem", fontWeight: 500 }}>Filtro +18:</span>
+                <button
+                  onClick={() => {
+                    hapticFeedback.light();
+                    toggleCensor();
+                  }}
+                  className="glass-panel"
+                  style={{
+                    padding: "0.6rem 1.5rem",
+                    borderRadius: "12px",
+                    border: isCensored ? "1px solid rgba(217, 119, 87, 0.4)" : "1px solid rgba(255,255,255,0.1)",
+                    background: isCensored ? "rgba(217, 119, 87, 0.15)" : "rgba(255,255,255,0.05)",
+                    color: isCensored ? "var(--color-accent)" : "rgba(255,255,255,0.6)",
+                    fontWeight: 500,
+                    cursor: "pointer",
+                    transition: "all 0.3s ease",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem"
+                  }}
+                >
+                  {isCensored ? "Ligado" : "Desligado"}
+                </button>
+              </div>
+
+              {/* Links and Actions */}
+              <div style={{ display: "flex", gap: "1.5rem" }}>
+                <a
                 href="/playlist"
                 onClick={() => setShowProfiles(false)}
                 className="glass-panel"
                 style={{
-                  padding: "1rem 3rem",
-                  borderRadius: "100px",
+                  padding: "0.8rem 2.5rem",
+                  borderRadius: "12px",
+                  background: "transparent",
+                  border: "1px solid rgba(255,255,255,0.2)",
                   color: "#fff",
                   textDecoration: "none",
-                  fontSize: "1.1rem",
-                  fontWeight: 600,
+                  fontSize: "1rem",
+                  fontWeight: 500,
                   transition: "background 0.2s, transform 0.2s",
                   display: "flex",
                   alignItems: "center",
@@ -278,12 +316,13 @@ export default function ProfileMenu() {
                 }}
                 className="glass-panel"
                 style={{
-                  padding: "1rem 3rem",
-                  borderRadius: "100px",
+                  padding: "0.8rem 2.5rem",
+                  borderRadius: "12px",
+                  background: "transparent",
                   color: "#ff6b6b",
-                  border: "none",
-                  fontSize: "1.1rem",
-                  fontWeight: 600,
+                  border: "1px solid rgba(255, 107, 107, 0.3)",
+                  fontSize: "1rem",
+                  fontWeight: 500,
                   cursor: "pointer",
                   transition: "background 0.2s, transform 0.2s"
                 }}
@@ -297,8 +336,10 @@ export default function ProfileMenu() {
                 }}
               >
                 Sair da Conta
-              </button>
+                </button>
+              </div>
             </div>
+            )}
           </div>
         )}
       </div>

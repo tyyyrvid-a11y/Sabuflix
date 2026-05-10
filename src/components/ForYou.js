@@ -4,6 +4,9 @@ import { useEffect, useState, useRef } from "react";
 import { getTrending, getMovieSimilar, getTVSimilar, getDiscover, getImageUrl } from "@/lib/tmdb";
 import { supabase } from "@/lib/supabase";
 import SaveToPlaylist from "./SaveToPlaylist";
+import Top10Row from "./Top10Row";
+import AdultCensor from "./AdultCensor";
+import RatingBadge from "./RatingBadge";
 
 function RecommendationRow({ title, items, setHeroItem, openPlayer, isFeatured = false }) {
   const scrollRef = useRef(null);
@@ -77,6 +80,9 @@ function RecommendationRow({ title, items, setHeroItem, openPlayer, isFeatured =
                 transition: 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)'
               }}
             />
+            
+            <RatingBadge item={item} />
+            <AdultCensor isAdult={item.adult} />
             
             <div style={{
               position: 'absolute',
@@ -278,6 +284,7 @@ export default function ForYou({ setHeroItem, openPlayer }) {
 
   return (
     <div style={{ width: '100%', maxWidth: '1400px', margin: '0 auto', paddingTop: '2rem' }}>
+      <Top10Row setHeroItem={setHeroItem} openPlayer={openPlayer} />
       {sections.map((section, idx) => (
         <RecommendationRow 
           key={idx}

@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { searchMulti, getMovieSimilar, getTVSimilar, getPersonCombinedCredits, getImageUrl } from "@/lib/tmdb";
 import SaveToPlaylist from "./SaveToPlaylist";
+import AdultCensor from "./AdultCensor";
+import RatingBadge from "./RatingBadge";
 
 export default function SmartSearch({ query, setBackdrop, openPlayer, openBiography }) {
   const [highlightResults, setHighlightResults] = useState([]);
@@ -126,6 +128,9 @@ export default function SmartSearch({ query, setBackdrop, openPlayer, openBiogra
             backgroundColor: '#111'
           }}
         />
+        
+        <RatingBadge item={item} />
+        <AdultCensor isAdult={item.adult} />
         
         <div style={{
           position: 'absolute',

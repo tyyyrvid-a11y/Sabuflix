@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 
-export default function AuthModal({ isOpen, onClose }) {
+export default function AuthModal({ isOpen, onClose, hideClose = false }) {
   const [mode, setMode] = useState("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -50,12 +50,14 @@ export default function AuthModal({ isOpen, onClose }) {
 
   return (
     <div 
-      onClick={onClose}
+      onClick={hideClose ? undefined : onClose}
       style={{
         position: "fixed",
         top: 0, left: 0, right: 0, bottom: 0,
-        backgroundColor: "rgba(0,0,0,0.9)",
-        zIndex: 1000,
+        backgroundColor: "rgba(30, 29, 27, 0.95)",
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
+        zIndex: 100000,
         display: "flex",
         alignItems: "center",
         justifyContent: "center"
@@ -67,12 +69,15 @@ export default function AuthModal({ isOpen, onClose }) {
         style={{
           width: "90%",
           maxWidth: "400px",
-          padding: "2rem",
-          borderRadius: "20px"
+          padding: "3rem 2.5rem",
+          borderRadius: "24px",
+          background: "rgba(44, 42, 40, 0.85)",
+          boxShadow: "0 20px 50px rgba(0,0,0,0.5)"
         }}
       >
-        <button 
-          onClick={onClose}
+        {!hideClose && (
+          <button 
+            onClick={onClose}
           style={{
             position: "absolute",
             top: "1rem",
@@ -85,14 +90,17 @@ export default function AuthModal({ isOpen, onClose }) {
           }}
         >
           ×
-        </button>
+          </button>
+        )}
 
         <h2 style={{
           color: "#fff",
-          fontSize: "1.8rem",
-          fontWeight: 600,
-          marginBottom: "1.5rem",
-          textAlign: "center"
+          fontSize: "2rem",
+          fontFamily: "var(--font-title)",
+          fontWeight: 400,
+          marginBottom: "2rem",
+          textAlign: "center",
+          letterSpacing: "-0.02em"
         }}>
           {mode === "login" ? "Entrar" : "Criar Conta"}
         </h2>
@@ -166,15 +174,30 @@ export default function AuthModal({ isOpen, onClose }) {
             disabled={loading}
             className="glass-panel"
             style={{
+              marginTop: "0.5rem",
               padding: "1rem",
-              borderRadius: "10px",
+              borderRadius: "12px",
               border: "none",
               background: "#fff",
-              color: "#000",
+              color: "#1e1d1b",
               fontSize: "1rem",
-              fontWeight: 600,
+              fontWeight: 500,
               cursor: loading ? "not-allowed" : "pointer",
-              opacity: loading ? 0.7 : 1
+              opacity: loading ? 0.7 : 1,
+              transition: "transform 0.2s, box-shadow 0.2s",
+              boxShadow: "0 4px 15px rgba(0,0,0,0.3)"
+            }}
+            onMouseOver={(e) => {
+              if(!loading) {
+                e.currentTarget.style.transform = "scale(1.02)";
+                e.currentTarget.style.boxShadow = "0 6px 20px rgba(0,0,0,0.4)";
+              }
+            }}
+            onMouseOut={(e) => {
+              if(!loading) {
+                e.currentTarget.style.transform = "scale(1)";
+                e.currentTarget.style.boxShadow = "0 4px 15px rgba(0,0,0,0.3)";
+              }
             }}
           >
             {loading ? "Carregando..." : (mode === "login" ? "Entrar" : "Criar Conta")}
