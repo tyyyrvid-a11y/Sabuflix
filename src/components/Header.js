@@ -35,6 +35,7 @@ export default function Header() {
   }, []);
 
   return (
+    <>
     <header style={{
       position: "fixed",
       top: 0,
@@ -119,5 +120,24 @@ export default function Header() {
         <ProfileMenu user={user} />
       </nav>
     </header>
+
+    {/* Bottom Tab Bar for Mobile/PWA */}
+    <nav className="bottom-tab-bar">
+      <Link href="/" onClick={() => hapticFeedback.light()} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', textDecoration: 'none', color: '#fff', opacity: 0.8 }}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span style={{ fontSize: '0.65rem', fontWeight: 500 }}>Início</span>
+      </Link>
+      
+      <Link href="/genres" onClick={() => hapticFeedback.light()} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', textDecoration: 'none', color: '#fff', opacity: 0.8 }}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="21.17" x2="12" y1="8" y2="8"/><line x1="3.95" x2="8.54" y1="6.06" y2="14"/><line x1="10.88" x2="15.46" y1="21.94" y2="14"/></svg>
+        <span style={{ fontSize: '0.65rem', fontWeight: 500 }}>Explorar</span>
+      </Link>
+
+      <Link href="/playlist" onClick={() => hapticFeedback.light()} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', textDecoration: 'none', color: '#fff', opacity: 0.8 }}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg>
+        <span style={{ fontSize: '0.65rem', fontWeight: 500 }}>Sua Lista</span>
+      </Link>
+    </nav>
+    </>
   );
 }

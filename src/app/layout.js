@@ -18,13 +18,27 @@ const lora = Lora({
 export const metadata = {
   title: "SabuFlix | O Ápice do Streaming",
   description: "Um centro de streaming premium de classe mundial para filmes e séries. Descubra um novo nível de entretenimento imersivo.",
-  themeColor: "#000000",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "SabuFlix",
+  },
   openGraph: {
     title: "SabuFlix",
     description: "Um centro de streaming premium de classe mundial.",
     type: "website",
     locale: "pt_BR",
   },
+};
+
+export const viewport = {
+  themeColor: "#000000",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }) {
