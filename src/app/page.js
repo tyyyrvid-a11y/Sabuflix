@@ -148,31 +148,31 @@ export default function Home() {
           width: "100%",
           display: "flex",
           justifyContent: "center",
-          marginTop: query ? "2rem" : "1.5rem",
-          marginBottom: "2rem",
-          transition: "margin 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
+          marginTop: query ? "3rem" : "2.5rem",
+          marginBottom: query ? "2.5rem" : "3.5rem",
+          transition: "all 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
         }}>
           <div
             className="glass-panel animate-fade-in-up"
             style={{
               display: "flex",
               alignItems: "center",
-              gap: "0.75rem",
-              padding: "0.5rem 1.25rem 0.5rem 1.5rem",
+              gap: "1rem",
+              padding: "0.75rem 1.25rem 0.75rem 1.75rem",
               borderRadius: "100px",
-              width: "min(640px, 95vw)",
-              background: "rgba(255,255,255,0.05)",
-              border: "1px solid rgba(255,255,255,0.1)",
+              width: "min(680px, 92vw)",
+              background: "rgba(255,255,255,0.06)",
+              border: "1px solid rgba(255,255,255,0.12)",
               boxShadow: query
-                ? "0 8px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.08)"
-                : "0 4px 20px rgba(0,0,0,0.3)",
-              transition: "box-shadow 0.4s ease",
+                ? "0 12px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.1)"
+                : "0 6px 28px rgba(0,0,0,0.35)",
+              transition: "box-shadow 0.4s ease, background 0.4s ease",
               animationDelay: "0.1s",
             }}
           >
             <div className="glass-panel-glow" />
             {/* Search icon */}
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
               <circle cx="11" cy="11" r="8" />
               <path d="m21 21-4.3-4.3" />
             </svg>
@@ -188,12 +188,12 @@ export default function Home() {
                 border: "none",
                 outline: "none",
                 color: "#fff",
-                fontSize: "1.1rem",
+                fontSize: "1.15rem",
                 fontFamily: "var(--font-inter)",
                 fontWeight: 400,
                 letterSpacing: "-0.01em",
                 width: "100%",
-                padding: "0.7rem 0",
+                padding: "0.85rem 0",
                 caretColor: "#fff",
               }}
             />
@@ -204,24 +204,24 @@ export default function Home() {
                 onClick={clearSearch}
                 className="animate-fade-in"
                 style={{
-                  background: "rgba(255,255,255,0.12)",
+                  background: "rgba(255,255,255,0.1)",
                   border: "none",
                   borderRadius: "50%",
-                  width: "26px",
-                  height: "26px",
+                  width: "30px",
+                  height: "30px",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   cursor: "pointer",
-                  color: "rgba(255,255,255,0.7)",
+                  color: "rgba(255,255,255,0.65)",
                   flexShrink: 0,
                   padding: 0,
-                  transition: "background 0.2s ease",
+                  transition: "background 0.2s ease, color 0.2s ease",
                 }}
-                onMouseOver={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.2)"}
-                onMouseOut={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.12)"}
+                onMouseOver={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.2)"; e.currentTarget.style.color = "#fff"; }}
+                onMouseOut={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; e.currentTarget.style.color = "rgba(255,255,255,0.65)"; }}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
                   <path d="M18 6 6 18M6 6l12 12" />
                 </svg>
               </button>
