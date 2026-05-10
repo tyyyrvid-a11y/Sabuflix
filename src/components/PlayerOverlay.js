@@ -176,17 +176,18 @@ export default function PlayerOverlay({ item, onClose }) {
     <div className="animate-fade-in" style={{
       position: 'fixed',
       top: 0, left: 0, right: 0, bottom: 0,
-      backgroundColor: '#1e1d1b', // Claude warm dark background
-      zIndex: 100,
+      backgroundColor: '#1e1d1b',
+      zIndex: 99999,
       overflowY: 'auto',
-      overflowX: 'hidden'
+      overflowX: 'hidden',
+      WebkitOverflowScrolling: 'touch'
     }}>
       {/* Player Section */}
       <div style={{
         width: '100%',
         maxWidth: '1200px',
-        margin: '2rem auto 1rem',
-        padding: '0 1.5rem',
+        margin: '0 auto',
+        padding: '0',
         position: 'relative'
       }}>
 
@@ -194,8 +195,8 @@ export default function PlayerOverlay({ item, onClose }) {
           position: 'relative',
           width: '100%',
           aspectRatio: '16/9',
-          marginTop: '4rem',
-          borderRadius: '16px',
+          marginTop: '0',
+          borderRadius: '0',
           overflow: 'hidden',
           backgroundColor: '#000',
           boxShadow: '0 25px 50px -12px rgba(0,0,0,0.8)'
@@ -263,7 +264,7 @@ export default function PlayerOverlay({ item, onClose }) {
       </div>
 
       {/* Metadata & Episodes Section */}
-      <div style={{ width: '100%', maxWidth: '1200px', margin: '0 auto', padding: '1rem 1.5rem 4rem' }}>
+      <div style={{ width: '100%', maxWidth: '1200px', margin: '0 auto', padding: '1rem 1rem 6rem' }}>
         
         {/* Title Block */}
         <div style={{ marginBottom: '2rem' }}>
