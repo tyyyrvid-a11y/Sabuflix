@@ -153,74 +153,8 @@ export default function Home() {
                 ▶ Assistir
               </button>
               
-              <button 
-                onClick={() => {
-                  if (heroItem.media_type === 'person') {
-                    hapticFeedback.light();
-                    setBiographyPerson(heroItem);
-                  }
-                }}
-                 style={{
-                  background: 'rgba(255,255,255,0.1)',
-                  backdropFilter: 'blur(20px) saturate(180%)',
-                  WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-                  color: '#fff',
-                  border: '1px solid rgba(255,255,255,0.15)',
-                  padding: '0.8rem 2.5rem',
-                  borderRadius: '12px',
-                  fontWeight: 500,
-                  fontSize: '1rem',
-                  cursor: heroItem.media_type === 'person' ? 'pointer' : 'default',
-                  transition: 'all 0.2s',
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-                  opacity: heroItem.media_type === 'person' ? 1 : 0.5
-                }}
-                onMouseOver={(e) => { 
-                  if(heroItem.media_type === 'person') {
-                    e.currentTarget.style.background = 'rgba(255,255,255,0.15)';
-                    e.currentTarget.style.transform = 'scale(1.03)';
-                  }
-                }}
-                onMouseOut={(e) => { 
-                  if(heroItem.media_type === 'person') {
-                    e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
-                    e.currentTarget.style.transform = 'scale(1)';
-                  }
-                }}
-              >
-                Detalhes
-              </button>
 
-              <button
-                onClick={handleSurpriseMe}
-                style={{
-                  background: 'rgba(255,255,255,0.1)',
-                  backdropFilter: 'blur(20px) saturate(180%)',
-                  WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-                  color: '#fff',
-                  border: '1px solid rgba(255,255,255,0.15)',
-                  padding: '0.8rem 2rem',
-                  borderRadius: '12px',
-                  fontWeight: 500,
-                  fontSize: '1rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem'
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.15)';
-                  e.currentTarget.style.transform = 'scale(1.03)';
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
-                  e.currentTarget.style.transform = 'scale(1)';
-                }}
-              >
-                <span style={{ fontSize: '1.2rem' }}>🎲</span> Surpreenda-me
-              </button>
+
             </div>
           </div>
         )}
